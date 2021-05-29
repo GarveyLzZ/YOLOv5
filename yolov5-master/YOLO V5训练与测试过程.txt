@@ -1,0 +1,36 @@
+一、环境配置
+	按照requirements.txt中配置即可，需要注意的是torchvision需要自己去pytorch官网根据电脑不同的
+	CUDA版本进行专门的配置。如果电脑是CUDA 10.0版本，使用10.1版本的torchvision也可以兼容。
+
+二、训练
+	1、数据的准备工作
+		在YOLO V5的文件夹下，有两个子文件夹，分别为coco128，yolov5-master。
+		其中，coco128文件夹中放置的为训练的图片与label，yolov5-master文件夹下放置的是模型等文件。
+		在coco128文件夹下有两个子文件夹，分别为images和labels，两个文件夹中都有train2017两个文件
+			夹分别放置训练图片与训练的bounding box。
+			例如：
+				YOLO V5/coco128/images/train/000000109622.jpg  # image
+				YOLO V5/coco128/labels/train/000000109622.txt  # label
+		要求：对图片的大小和格式没有要求，对bounding box的信息有要求。
+			bounding box中，每一个txt文件对应一个图片；在每一个txt中，每个目标占一行。
+			每一行的信息为，[ 类别(索引)，bbx的x的中心点，bbx的x的中心点，bbx的宽度，bbx的高度 ]
+			注意，
+				a)  上面的类别的值与总共训练几种类型有关。
+					比如训练两种类，classes = ['paiwuba', 'paiwuguan']
+					那么在labels的txt的文档中，'paiwuba'的类别则为0，'paiwuguan'的类型则为1。
+				b)  bbx的x的中心点，bbx的x的中心点，bbx的宽度，bbx的高度 这四个信息都是归一化之后
+					的值，也就是说这四个值一定都是在[0,1]之间的。
+	2、修改自己数据集的部分设置
+		(1) 修改YOLO V5\yolov5-master\models\yolov5s.yaml中的第二行的nc值，训练几个目标就修改为几。
+			注：修改的文件不是一定是yolov5s,s是最轻量级的模型，如果需要可以选择别的模型。在train.py
+				中的第363行修改。
+		(2) 修改data\coco128.yaml中15行和18行，15行修改的与(1)中相同，18行修改自己训练的种类标签。
+	3、训练
+		在确保第一步和第二步完成的情况下，直接python train.py即可。如果需要修改epoch和batch_size的值，
+		在train.py的361和362行修改。
+二、测试
+	修改detect.py中的176行，一般都为last.pt。得到的结果保存在inference中。如果需要使用评价机制，在
+	detect中加入相关代码，将得到的结果txt复制出来即可。
+
+三、数据增强
+	修改输入输出路径即可。即可得到不同旋转角度的images和xml。
